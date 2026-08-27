@@ -107,7 +107,7 @@ class PaperTradingBot:
         print(f"\n🤖 Starting bot with ${self.initial_capital} capital...\n")
         
         for index in range(len(self.data)):
-            date = self.data.index[index]
+            date = self.data.index[index].date()
             price = self.data['Close'].iloc[index]
             
             # Check buy signal
@@ -124,7 +124,7 @@ class PaperTradingBot:
                     'cost': amount_to_invest
                 }
                 self.trades.append(trade)
-                print(f"✅ BUY  - {date.date()} @ ${price:.2f} | Bought {self.position:.6f} {self.symbol}")
+                print(f"✅ BUY  - {date} @ ${price:.2f} | Bought {self.position:.6f} {self.symbol}")
             
             # Check sell signal
             elif self._should_sell(index):
@@ -143,7 +143,7 @@ class PaperTradingBot:
                 }
                 self.trades.append(trade)
                 
-                print(f"🔴 SELL - {date.date()} @ ${price:.2f} | Profit/Loss: ${profit_loss:.2f} ({profit_loss_pct:.2f}%)")
+                print(f"🔴 SELL - {date} @ ${price:.2f} | Profit/Loss: ${profit_loss:.2f} ({profit_loss_pct:.2f}%)")
                 
                 self.cash += proceeds
                 self.position = 0
@@ -157,10 +157,11 @@ class PaperTradingBot:
         # Sell any remaining position at the end
         if self.position > 0:
             final_price = self.data['Close'].iloc[-1]
+            final_date = self.data.index[-1].date()
             proceeds = self.position * final_price
             self.cash += proceeds
             self.position = 0
-            print(f"\n🔴 SELL (Final) - {self.data.index[-1].date()} @ ${final_price:.2f}")
+            print(f"\n🔴 SELL (Final) - {final_date} @ ${final_price:.2f}")
         
         self.portfolio_value = self.cash
     
